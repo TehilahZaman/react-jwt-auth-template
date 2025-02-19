@@ -4,8 +4,8 @@ const BASE_URL = `${import.meta.env.VITE_BACK_END_SERVER_URL}/auth`;
 
 // 1. need formData from the signUp form copmonent
 // when do wwe want to call this function ?  - when the user submits the sign up form
-// where do we want it ? - call it in sign up - in handle submit 
-    // could also be called in app.jsx and passed as a prop 
+// where do we want it ? - call it in sign up - in handle submit
+// could also be called in app.jsx and passed as a prop
 
 const signUp = async (formData) => {
   try {
@@ -23,7 +23,7 @@ const signUp = async (formData) => {
     const data = await res.json();
 
     if (data.err) {
-        // throw new error jumps straight to the catch block 
+      // throw new error jumps straight to the catch block
       throw new Error(data.err);
     }
 
@@ -45,4 +45,30 @@ const signUp = async (formData) => {
   }
 };
 
-export { signUp };
+const signIn = async (formData) => {
+  try {
+    const res = await fetch(`${BASE_URL}/sign-in`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await res.json();
+
+    if (data.err) {
+      throw new Error(data.err);
+    }
+
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+      return JSON.parse(atob(data.token.split(".")[1])).payload;
+    }
+
+    throw new Error("Invalid response from server");
+  } catch (err) {
+    console.log(err);
+    throw new Error(err);
+  }
+};
+
+export { signUp, signIn };
